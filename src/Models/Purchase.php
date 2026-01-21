@@ -14,7 +14,6 @@ class Purchase
         $this->db = $db;
     }
 
-    // Méthode existante
     public function create($data)
     {
         $sql = "INSERT INTO {$this->table} (user_id, total_amount, status, created_at) 
@@ -30,7 +29,6 @@ class Purchase
         return $this->db->lastInsertId();
     }
 
-    // Méthode existante
     public function getUserPurchases($userId)
     {
         $sql = "SELECT * FROM {$this->table} 
@@ -42,6 +40,4 @@ class Purchase
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    // TODO: Ajouter d'autres méthodes selon les besoins
 }

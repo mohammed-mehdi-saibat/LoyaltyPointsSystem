@@ -1,0 +1,113 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Mon Tableau de Bord - ShopEasy
+{% endblock %}
+
+{% block content %}
+	<div class="main">
+		<h1>Bonjour,
+			{{ user.name }}
+			!</h1>
+		<p class="subtitle">Voici l'état de votre compte fidélité.</p>
+
+		<div class="products-grid">
+			<div class="product-card">
+				<div class="product-image">
+					<div class="product-icon">★</div>
+				</div>
+				<h2 class="product-name">Solde de Points</h2>
+				<div class="product-price">{{ user.total_points }}
+					pts</div>
+				<p class="product-description">
+					Vous gagnez 10 points pour chaque 100$ d'achat.
+				</p>
+				<a href="/FacileAchat/public/" class="btn btn-primary btn-full">Aller à la boutique</a>
+			</div>
+
+			<div class="product-card">
+				<h2 class="product-name">Mon Profil</h2>
+				<p>
+					<strong>Email :</strong>
+					{{ user.email }}</p>
+				<p>
+					<strong>Membre depuis :</strong>
+					{{ user.created_at|date("d/m/Y") }}</p>
+				<br>
+				<a href="/FacileAchat/public/logout" class="btn btn-secondary btn-small">Se déconnecter</a>
+			</div>
+		</div>
+
+		<div style="margin-top: 40px;">
+			<h2>Mes Bons de Réduction</h2>
+			<div class="products-grid" style="margin-top: 15px;">
+				{% for voucher in vouchers %}
+					<div class="product-card" style="border: 2px dashed #2c7a7b; background: #f0fff4; text-align: center; padding: 15px;">
+						<p style="margin: 0; font-size: 0.9em; color: #2c7a7b; font-weight: bold;">RÉDUCTION 5€ ACTIVÉE</p>
+						<code style="display: block; font-size: 1.4rem; background: #fff; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; color: #333;">
+							{{ voucher.code }}
+						</code>
+						<small style="color: #666;">Valable sur tout le site</small>
+					</div>
+				{% else %}
+					<div class="result-card" style="padding: 20px; text-align: center; color: #777; width: 100%;">
+						Vous n'avez pas encore de bons de réduction.
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+
+		<div style="margin-top: 40px;">
+			<h2>Historique des Points</h2>
+			<div class="result-card">
+				<table style="width: 100%; border-collapse: collapse; text-align: left;">
+					<thead>
+						<tr style="border-bottom: 2px solid #eee;">
+							<th style="padding: 12px;">Date</th>
+							<th>Type</th>
+							<th>Points</th>
+							<th>Description</th>
+							<th>Sold After</th>
+						</tr>
+					</thead>
+					<tbody>
+						{# {% for trans in transactions %}
+						<tr style="border-bottom: 1px solid #eee;">
+							<td style="padding: 12px;">{{ trans.created_at|date("d/m/Y H:i") }}</td>
+							<td>
+								<span style="padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; background: {{ trans.type == 'earned' ? '#e6fffa' : '#fff5f5' }}; color: {{ trans.type == 'earned' ? '#2c7a7b' : '#c53030' }};">
+									{{ trans.type == 'earned' ? 'Gagné' : 'Utilisé' }}
+								</span>
+							</td>
+							<td>
+								<strong style="color: {{ trans.type == 'earned' ? '#2c7a7b' : '#c53030' }};">
+									{{ trans.type == 'earned' ? '+' : '-' }}{{ trans.amount }}
+								</strong>
+							</td>
+							<td>{{ trans.description }}</td>
+							<td style="font-weight: bold; color: #4a5568;">{{ trans.balance_after }}
+								pts</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="5" style="padding: 20px; text-align: center; color: #777;">Aucune transaction pour le moment.</td>
+						</tr>
+					{% endfor %} #}
+					</tbody>
+					{% for trans in transactions %}
+						<tr>
+							<td>{{ trans.created_at|date("d/m/Y H:i") }}</td>
+							<td>{{ trans.type == 'earned' ? 'Gagné' : 'Utilisé' }}</td>
+							<td>{{ trans.type == 'earned' ? '+' : '-' }}{{ trans.amount }}</td>
+							<td>{{ trans.description }}</td>
+							<td>
+								<strong>{{ trans.balance_after }}
+									pts</strong>
+							</td>
+							{# This is the key line #}
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Administration - ShopEasy
+{% endblock %}
+
+{% block content %}
+	<div class="main">
+		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+			<h1>Panneau d'Administration</h1>
+			<span class="badge" style="background: #2d3748; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold;">Vue Manager</span>
+		</div>
+
+		<div class="grid-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+
+			<div class="result-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+				<h3 style="margin-top: 0; color: #2d3748; border-bottom: 2px solid #edf2f7; padding-bottom: 10px;">Liste des Clients</h3>
+				<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+					<thead>
+						<tr style="text-align: left; color: #718096; font-size: 0.9em;">
+							<th style="padding: 12px 10px;">Email</th>
+							<th style="padding: 12px 10px;">Points</th>
+							<th style="padding: 12px 10px;">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for user in users %}
+							<tr style="border-bottom: 1px solid #edf2f7;">
+								<td style="padding: 12px 10px;">
+									<strong style="color: #2d3748;">{{ user.email }}</strong>
+									{% if user.role == 'admin' %}
+										<span style="font-size: 0.7em; background: #fed7d7; color: #822727; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">ADMIN</span>
+									{% endif %}
+								</td>
+								<td style="padding: 12px 10px; font-weight: bold; color: #3182ce;">
+									{{ user.total_points }}
+									pts
+								</td>
+								<td style="padding: 12px 10px;">
+									{% if user.id != session.user_id %}
+										<form action="/FacileAchat/public/admin/delete-user" method="POST" onsubmit="return confirm('Attention: Supprimer cet utilisateur effacera également tous ses points et ses bons de réduction. Confirmer ?');">
+											<input type="hidden" name="user_id" value="{{ user.id }}">
+											<button type="submit" style="background: none; border: none; color: #e53e3e; cursor: pointer; text-decoration: underline; font-size: 0.85em; padding: 0;">
+												Supprimer
+											</button>
+										</form>
+									{% else %}
+										<span style="color: #cbd5e0; font-size: 0.8em; font-style: italic;">(C'est vous)</span>
+									{% endif %}
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+
+			<div class="result-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+				<h3 style="margin-top: 0; color: #2d3748; border-bottom: 2px solid #edf2f7; padding-bottom: 10px;">Bons de réduction générés</h3>
+				<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+					<thead>
+						<tr style="text-align: left; color: #718096; font-size: 0.9em;">
+							<th style="padding: 12px 10px;">Code</th>
+							<th style="padding: 12px 10px;">Client</th>
+							<th style="padding: 12px 10px;">Statut</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for voucher in vouchers %}
+							<tr style="border-bottom: 1px solid #edf2f7;">
+								<td style="padding: 12px 10px;">
+									<code style="background: #f7fafc; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: bold; color: #444;">{{ voucher.code }}</code>
+								</td>
+								<td style="padding: 12px 10px; font-size: 0.9em; color: #4a5568;">{{ voucher.email }}</td>
+								<td style="padding: 12px 10px;">
+									{% if voucher.is_used %}
+										<span style="color: #e53e3e; font-size: 0.9em; font-weight: bold;">● Utilisé</span>
+									{% else %}
+										<span style="color: #38a169; font-size: 0.9em; font-weight: bold;">● Actif</span>
+									{% endif %}
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}

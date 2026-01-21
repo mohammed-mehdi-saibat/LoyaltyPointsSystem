@@ -1,31 +1,65 @@
 <?php
-
+session_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+use App\Core\Database;
+use App\Controllers\AuthController;
+use App\Controllers\ShopController;
+use App\Controllers\RewardController;
 
-
+$db = Database::getConnection();
 $loader = new FilesystemLoader(__DIR__ . '/../templates');
-$twig = new Environment($loader, [
-    'cache' => false,
-    'debug' => true
-]);
+$twig = new Environment($loader);
 
+$twig->addGlobal('session', $_SESSION);
 
-$requestUri = $_SERVER['REQUEST_URI'];
+$authController = new AuthController($db, $twig);
+$shopController = new ShopController($db, $twig);
+$rewardController = new RewardController($db, $twig);
+
+$url = $_SERVER['REQUEST_URI'];
 $basePath = '/FacileAchat/public';
-$path = str_replace($basePath, '', $requestUri);
-$path = strtok($path, '?');
+$route = str_replace($basePath, '', $url);
+$route = explode('?', $route)[0];
 
-
-if ($path === '/' || $path === '') {
-
-    echo $twig->render('home.twig', [
-        'title' => 'FacileAchat - Accueil',
-        'welcome' => 'Bienvenue sur votre plateforme de fidélité !'
-    ]);
-} else {
-    header("HTTP/1.0 404 Not Found");
-    echo "<h1>404 - Page Non Trouvée</h1>";
+switch ($route) {
+    case '/':
+    case '':
+        $shopController->showShop();
+        break;
+    case '/register':
+        $_SERVER['REQUEST_METHOD'] === 'POST' ? $authController->handleRegister() : $authController->showRegister();
+        break;
+    case '/login':
+        $_SERVER['REQUEST_METHOD'] === 'POST' ? $authController->handleLogin() : $authController->showLogin();
+        break;
+    case '/dashboard':
+        $authController->showDashboard();
+        break;
+    case '/logout':
+        $authController->logout();
+        break;
+    case '/buy':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') $shopController->buy();
+        break;
+    case '/rewards':
+        $rewardController->showRewards();
+        break;
+    case '/redeem':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') $rewardController->redeem();
+        break;
+    case '/admin':
+        $controller = new App\Controllers\AdminController($db, $twig);
+        $controller->index();
+        break;
+    case '/admin/delete-user':
+        $controller = new App\Controllers\AdminController($db, $twig);
+        $controller->deleteUser();
+        break;
+    default:
+        http_response_code(404);
+        echo "404 - Page non trouvée";
+        break;
 }

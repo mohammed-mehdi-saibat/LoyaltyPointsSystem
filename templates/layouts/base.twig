@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>
+			{% block title %}ShopEasy - Loyalty
+			{% endblock %}
+		</title>
+		<link rel="stylesheet" href="/FacileAchat/public/css/style.css">
+	</head>
+	<body>
+		<header class="header">
+			<div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+				<a href="/FacileAchat/public/" class="logo">FacileAchat</a>
+				<nav class="nav">
+					<a href="/FacileAchat/public/" class="cart-link">Boutique</a>
+					{% if session.user_id %}
+						<a href="/FacileAchat/public/rewards" class="cart-link">Récompenses</a>
+						<a href="/FacileAchat/public/dashboard" class="cart-link">Mon Compte</a>
+						<a href="/FacileAchat/public/logout" class="cart-link" style="color: #ff4d4d;">Déconnexion</a>
+					{% else %}
+						<a href="/FacileAchat/public/login" class="cart-link">Connexion</a>
+						<a href="/FacileAchat/public/register" class="cart-link">Inscription</a>
+					{% endif %}
+					{% if session.user_role == 'admin' %}
+						<a href="/FacileAchat/public/admin" style="color: #e53e3e; font-weight: bold;">[ Admin ]</a>
+					{% endif %}
+				</nav>
+			</div>
+		</header>
+
+		<main class="main container">
+
+			{% if session.flash %}
+				<div style="padding: 15px; margin-bottom: 20px; border-radius: 8px; text-align: center;
+												                        background-color: {{ session.flash.type == 'success' ? '#def7ec' : '#fde8e8' }};
+												                        color: {{ session.flash.type == 'success' ? '#03543f' : '#9b1c1c' }};
+												                        border: 1px solid {{ session.flash.type == 'success' ? '#84e1bc' : '#f8b4b4' }};">
+					{{ session.flash.message }}
+				</div>
+			{% endif %}
+
+			{% block content %}{% endblock %}
+		</main>
+
+		<footer class="footer">
+			<p>&copy; 2026 FacileAchat - Made At YouCode</p>
+		</footer>
+	</body>
+</html>

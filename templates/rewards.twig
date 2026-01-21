@@ -1,0 +1,24 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Récompenses - ShopEasy
+{% endblock %}
+
+{% block content %}
+<div class="main">
+	<h1>Récompenses disponibles</h1>
+	<p class="subtitle">Échangez vos points contre des avantages exclusifs.</p>
+
+	<div class="products-grid">
+		<div class="product-card">
+			<div class="product-image">
+				<div class="product-icon">🎁</div>
+			</div>
+			<h2 class="product-name">Bon d'achat de 5$</h2>
+			<div class="product-price">500 pts</div>
+			<p class="product-description">
+				Obtenez une réduction immédiate de 5$ sur votre prochaine commande.
+			</p>
+
+			<form action="/FacileAchat/public/redeem" method="POST">
+
+				<button type="submit" class="btn btn-primary btn-full" {% if user.total_points < 500 %}disabled{% endif %}> {% if user.total_points < 500 %} Il vous manque {{ 500 - user.total_points }} pts {% else %} Utiliser mes points {% endif %} </button> </form> </div> </div> </div> {% endblock %}

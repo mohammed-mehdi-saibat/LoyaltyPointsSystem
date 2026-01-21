@@ -1,59 +1,100 @@
 <?php
-// require_once __DIR__ . '/../models/Purchase.php';
-// require_once __DIR__ . '/../models/User.php';
 
 namespace App\Controllers;
 
 use App\Models\Purchase;
-use App\Models\User;
+use App\Models\PointsTransaction;
+use App\Models\Reward;
 
 class ShopController
 {
     private $purchaseModel;
-    private $userModel;
+    private $pointsModel;
+    private $twig;
+    private $db;
 
-    public function __construct($db)
+    public function __construct($db, $twig)
     {
+        $this->db = $db;
         $this->purchaseModel = new Purchase($db);
-        $this->userModel = new User($db);
+        $this->pointsModel = new PointsTransaction($db);
+        $this->twig = $twig;
     }
 
-    // Méthode existante - à analyser et compléter
-    public function processPurchase($userId, $cartItems)
+    public function showShop()
     {
-        $totalAmount = 0;
+        echo $this->twig->render('shop.twig');
+    }
 
-        // Calcul du montant total
-        foreach ($cartItems as $item) {
-            $totalAmount += $item['price'] * $item['quantity'];
+    public function buy()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /FacileAchat/public/login');
+            exit;
         }
 
-        // Enregistrement de l'achat (existant)
+        $price = isset($_POST['price']) ? (float)$_POST['price'] : 0;
+        $voucherCode = isset($_POST['voucher_code']) ? trim($_POST['voucher_code']) : null;
+        $discount = 0;
+        $messagePrefix = "";
+
+        // Check if voucher is valid
+        if (!empty($voucherCode)) {
+            $rewardModel = new Reward($this->db);
+            $voucher = $rewardModel->validateVoucher($voucherCode, $_SESSION['user_id']);
+
+            if ($voucher) {
+                $discount = 5.00;
+                $rewardModel->markAsUsed($voucherCode);
+                $messagePrefix = "Code promo appliqué ! (-5$) ";
+            } else {
+                $_SESSION['flash'] = ['type' => 'error', 'message' => "Code invalide ou déjà utilisé."];
+                header('Location: /FacileAchat/public/');
+                exit;
+            }
+        }
+
+        $finalPrice = max(0, $price - $discount);
+        $cartItems = [['price' => $finalPrice, 'quantity' => 1]];
+        $result = $this->processPurchase($_SESSION['user_id'], $cartItems);
+
+        if ($result['success']) {
+            $_SESSION['flash'] = [
+                'type' => 'success',
+                'message' => $messagePrefix . "Achat réussi pour " . $finalPrice . "$ !"
+            ];
+            header('Location: /FacileAchat/public/dashboard');
+            exit;
+        }
+    }
+
+    public function processPurchase($userId, $cartItems)
+    {
+        $totalAmount = array_reduce($cartItems, function ($sum, $item) {
+            return $sum + ($item['price'] * $item['quantity']);
+        }, 0);
+
         $purchaseId = $this->purchaseModel->create([
             'user_id' => $userId,
             'total_amount' => $totalAmount,
             'status' => 'completed'
         ]);
 
-        // TODO: Ajouter la logique pour attribuer les points de fidélité
-        // Calculer les points gagnés (10 points pour chaque 100$)
-        // Enregistrer la transaction de points
-        // Mettre à jour le solde de l'utilisateur
+        $pointsEarned = $this->pointsModel->calculatePoints($totalAmount);
 
-        // Retourner le résultat
+        if ($pointsEarned > 0) {
+            $this->pointsModel->addTransaction(
+                $userId,
+                $pointsEarned,
+                'earned',
+                "Points gagnés pour l'achat #$purchaseId"
+            );
+        }
+
         return [
             'success' => true,
-            'purchase_id' => $purchaseId,
-            'total_amount' => $totalAmount,
-            'points_earned' => 0 // À calculer
+            'points_earned' => $pointsEarned,
+            'total_amount' => $totalAmount
         ];
-    }
-
-    // À compléter par les apprenants
-    private function calculatePoints($amount)
-    {
-        // TODO: Implémenter la logique de calcul
-        // 10 points pour chaque 100$ dépensés
-        return 0;
     }
 }

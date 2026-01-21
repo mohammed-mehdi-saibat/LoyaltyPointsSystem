@@ -1,0 +1,152 @@
+{# {% extends 'layouts/base.twig' %}
+
+{% block title %}Boutique - ShopEasy
+{% endblock %}
+
+{% block content %}
+	<div class="main">
+		<h1>Boutique High-Tech</h1>
+		<p class="subtitle">Cumulez des points :
+			<strong>10 pts par tranche de 100$ dépensés.</strong>
+		</p>
+
+		<div class="products-grid">
+			<div class="product-card">
+				<div class="product-image">
+					<img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=200&fit=crop" alt="Casque" style="width:100%; border-radius: 8px;">
+				</div>
+				<h2 class="product-name">Casque Premium</h2>
+				<div class="product-price">150$</div>
+				<p style="color: #2c7a7b; font-weight: bold;">+10 Points</p>
+				<form action="/FacileAchat/public/buy" method="POST">
+					<input type="hidden" name="price" value="150">
+					<button type="submit" class="btn btn-primary btn-full">Acheter</button>
+				</form>
+			</div>
+
+			<div class="product-card">
+				<div class="product-image">
+					<img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=300&h=200&fit=crop" alt="Clavier" style="width:100%; border-radius: 8px;">
+				</div>
+				<h2 class="product-name">Clavier RGB</h2>
+				<div class="product-price">95$</div>
+				<p style="color: #e53e3e; font-weight: bold;">+0 Points (Sous 100$)</p>
+				<form action="/FacileAchat/public/buy" method="POST">
+					<input type="hidden" name="price" value="95">
+					<button type="submit" class="btn btn-primary btn-full">Acheter</button>
+				</form>
+			</div>
+
+			<div class="product-card">
+				<div class="product-image">
+					<img src="https://images.pexels.com/photos/2115256/pexels-photo-2115256.jpeg?auto=compress&cs=tinysrgb&w=300" alt="Souris">
+				</div>
+				<h2 class="product-name">Souris Gaming</h2>
+				<div class="product-price">110$</div>
+				<p style="color: #2c7a7b; font-weight: bold;">+10 Points</p>
+				<form action="/FacileAchat/public/buy" method="POST">
+					<input type="hidden" name="price" value="110">
+					<button type="submit" class="btn btn-primary btn-full">Acheter</button>
+				</form>
+			</div>
+
+			<div class="product-card">
+				<div class="product-image">
+					<img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&h=200&fit=crop" alt="Ecran" style="width:100%; border-radius: 8px;">
+				</div>
+				<h2 class="product-name">Écran 4K</h2>
+				<div class="product-price">400$</div>
+				<p style="color: #2c7a7b; font-weight: bold;">+40 Points</p>
+				<form action="/FacileAchat/public/buy" method="POST">
+					<input type="hidden" name="price" value="400">
+					<button type="submit" class="btn btn-primary btn-full">Acheter</button>
+				</form>
+			</div>
+
+			<div class="product-card">
+				<div class="product-image">
+					<img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=200&fit=crop" alt="Laptop" style="width:100%; border-radius: 8px;">
+				</div>
+				<h2 class="product-name">Laptop Pro</h2>
+				<div class="product-price">1200$</div>
+				<p style="color: #2c7a7b; font-weight: bold;">+120 Points</p>
+				<form action="/FacileAchat/public/buy" method="POST">
+					<input type="hidden" name="price" value="1200">
+					<button type="submit" class="btn btn-primary btn-full">Acheter</button>
+				</form>
+			</div>
+
+			<div class="product-card">
+				<div class="product-image">
+					<img src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&h=200&fit=crop" alt="Tablette" style="width:100%; border-radius: 8px;">
+				</div>
+				<h2 class="product-name">Tablette Air</h2>
+				<div class="product-price">650$</div>
+				<p style="color: #2c7a7b; font-weight: bold;">+60 Points</p>
+				<form action="/FacileAchat/public/buy" method="POST">
+					<input type="hidden" name="price" value="650">
+					<button type="submit" class="btn btn-primary btn-full">Acheter</button>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %} #}
+
+
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Boutique - ShopEasy
+{% endblock %}
+
+{% block content %}
+	<div class="main">
+		<h1>Boutique High-Tech</h1>
+		<p class="subtitle">Cumulez des points :
+			<strong>10 pts par tranche de 100$ dépensés.</strong>
+		</p>
+
+		<div class="result-card" style="margin-bottom: 30px; border: 2px dashed #3182ce; background: #ebf8ff; padding: 20px;">
+			<div style="display: flex; gap: 15px; align-items: center; justify-content: center;">
+				<label style="font-weight: bold; color: #2c5282;">Code Promo :</label>
+				<input type="text" id="main_voucher_input" placeholder="SAVE5-XXXX" style="padding: 10px; border: 1px solid #cbd5e0; border-radius: 5px; width: 200px;">
+				<p style="margin: 0; font-size: 0.9em; color: #4a5568;">Le code sera appliqué lors de votre prochain achat.</p>
+			</div>
+		</div>
+
+		<div class="products-grid">
+			{% set products = [
+                {'name': 'Casque Premium', 'price': 150, 'img': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=200&fit=crop', 'pts': '10'},
+                {'name': 'Clavier RGB', 'price': 95, 'img': 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=300&h=200&fit=crop', 'pts': '0'},
+                {'name': 'Souris Gaming', 'price': 110, 'img': 'https://images.pexels.com/photos/2115256/pexels-photo-2115256.jpeg?auto=compress&cs=tinysrgb&w=300', 'pts': '10'},
+                {'name': 'Écran 4K', 'price': 400, 'img': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&h=200&fit=crop', 'pts': '40'},
+                {'name': 'Laptop Pro', 'price': 1200, 'img': 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=200&fit=crop', 'pts': '120'},
+                {'name': 'Tablette Air', 'price': 650, 'img': 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&h=200&fit=crop', 'pts': '60'}
+            ] %}
+
+			{% for product in products %}
+				<div class="product-card">
+					<div class="product-image">
+						<img src="{{ product.img }}" alt="{{ product.name }}">
+					</div>
+					<h2 class="product-name">{{ product.name }}</h2>
+					<div class="product-price">{{ product.price }}$</div>
+					<p style="color: {% if product.pts == '0' %}#e53e3e{% else %}#2c7a7b{% endif %}; font-weight: bold;">+{{ product.pts }}
+						Points</p>
+
+					<form action="/FacileAchat/public/buy" method="POST" onsubmit="appendVoucher(this)">
+						<input type="hidden" name="price" value="{{ product.price }}">
+						<input type="hidden" name="voucher_code" class="hidden-voucher-field">
+						<button type="submit" class="btn btn-primary btn-full">Acheter</button>
+					</form>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<script>
+		function appendVoucher(form) {
+const mainInput = document.getElementById('main_voucher_input').value;
+form.querySelector('.hidden-voucher-field').value = mainInput;
+}
+	</script>
+{% endblock %}

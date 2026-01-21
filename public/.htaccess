@@ -1,11 +1,4 @@
 RewriteEngine On
-
-# Force the base to be the public folder
-
-RewriteBase /FacileAchat/public/
-
-# Redirect everything that isn't a real file to index.php
-
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . index.php [L]
+RewriteRule ^ index.php [QSA,L]
